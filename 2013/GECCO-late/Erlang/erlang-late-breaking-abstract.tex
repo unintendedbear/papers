@@ -6,6 +6,7 @@
 \usepackage{url}
 
 \usepackage{url}
+\usepackage{array}
 
 \hyphenation{NIndexes}
 
@@ -65,7 +66,7 @@ Getting out of that mainstream it is not normally seen as a land for scientific 
 % Getting out of that mainstream it is not normally seen a land for improvement science.
 % Antonio - Esta frase casi no se entiende. La intento reescribir a ver si dice lo que tú querías.
 % Y yo la vuelvo a reescribir. - JJ
-One such language with a big potential is Erlang, which is an implementation technology that supports the functional and concurrent paradigms and that is starting to be used in the scientific community \cite{Sher2013}. 
+One such language with a big potential is Erlang, which is an implementation technology that supports the functional and concurrent paradigms and that is starting to be used in the scientific community \cite{Sher2013}.
 % Antonio - haz una breve inroduccióna Erlang aquí y dí si se usa o no en la comunidad científica. Pon alguna cita. ;)
 % afú, qué inglés... - JJ
 
@@ -84,7 +85,7 @@ Many such practices have been proposed in the object oriented paradigm
 side. This work tries to show some possible areas of improvement on
 that sense by focusing on GAs as a domain of application and
 describing how their principal traits can the be modeled by means of
-Erlang constructs. This will be done in the next section. 
+Erlang constructs. This will be done in the next section.
 
 % Antonio - cuenta en un par de líneas qué es Erlang. ;)
 
@@ -128,16 +129,16 @@ The use of messages eliminates the sharing of state and
 % Antonio - dí qué son mensajes inmutables
 eliminate many of the typical problems of concurrent development,
 namely, supporting the emulation of the Object Oriented (OO) paradigm
-with its modeling facilities. 
-
-Functional programming, the other main feature of the Erlang language, is defined by the use of functions in program composition and by using lists.
+with its modeling facilities. Functional programming, the other main feature of the Erlang language, is defined by the use of functions in program composition and by using lists.
 % Antonio - Esta frase no se entiende bien y está mal escrita. ;)
-Erlang honored the functional linage and includes ultra fast technologies for persist data called Dets and Mnesia. % que sirven para... - JJ
-% ¿las usas aquí? ¿Pueden ser útiles? - JJ 
+%Erlang honored the functional linage and includes ultra fast technologies for persist data called Dets and Mnesia. % que sirven para... - JJ
+% ¿las usas aquí? ¿Pueden ser útiles? - JJ
 % si no lo son podrías borrarlo. Y, por favor, comprueba la corrección
 % gramatical de número - JJ
-Besides, Erlang offers the concept of records for group data which helps to modularize the code. % y esto es útil porque... -JJ
+% JA: No, no las uso por ahora, son las BDs de Erlang...
+%Besides, Erlang offers the concept of records for group data which helps to modularize the code. % y esto es útil porque... -JJ
 % No me has contestado a esto...
+% JA: Había añadido "helps to modularize the code", pero ahora lo leo y creo que mejor lo quito.
 
 %\subsection{Genetic Algorithm mapping to Erlang}
 
@@ -197,27 +198,28 @@ Clients are modeled by actors. They are the units of evolution, with the main co
 
 The two previous components constitute the main features of the
 architecture of the algorithm; they are general-purpose and could be
-used for many problems. % Many problems qué? - JJ
+used for solve many differents optimization problems . % Many problems qué? - JJ
  In order to solve a particular situation, they must be
  \emph{injected} by several functions and data structures which define
  chromosomes, fitness function, mutation operator, selection criteria
  and replacement policy. All these particularizations must be
- implemented in an Erlang source file and configured in the
+ implemented in an Erlang source file and, in our case, configured in the
  \emph{configBuilder} module. % ¿Esto es general a todos los programas
                               % en Erlang? - JJ
 
 The proposed design promotes a clear separation between architecture
 (the general, constant and paradigmatic foundation part) and problem
 encoding (the representation and criteria of solution finding) which
-is good for applying the library to solve another problem.  %Lo has
+is good for applying the library to solve others practical problems with GAs using a pool based approach.  %Lo has
                                 %explicado en parte, pero no del
                                 %todo. ¿Por qué habría que querer
                                 %hacerlo así? ¿Vas a implementar otros
                                 %tipos de algoritmos genéticos?
                                 %¿Podría servir para cualquier
                                 %algoritmo basado en población?
+                                % JA: No, a lo que me refiero es que la biblioteca está diseñada de manera que se puede usar el mismo enfoque basado en pool a otros problemas para los que habría que usar otro cromosoma, función de evaluación etc ...
 This design has been implemented and tested with a simple benchmark
-problem. This will be presented in the next section. 
+problem. This will be presented in the next section.
 
 \section{Experiment and conclusions}
 \label{sec:conclusions}
@@ -226,19 +228,41 @@ In this ongoing project we are testing the efficiency and simplicity of implemen
 
 The library was tested with \emph{MaxOnes} problem. The chromosomes
 was 128 elements long, with an initial population of 256
-individuals. 50 clients were used and they worked with 20 individuals
-each time a pool assigned a generation to them. The solution, an
-optimum, was reached after 3159 assignments in 3.144590 seconds. For
-100 clients the solution was reached in 6.121570 seconds and 6446
-assignments; and for 25 clients it was 1835 assignments in 1.687000
-seconds. This results shows that in this case there it is not
+individuals; Table \ref{resultsTable} presents the results.
+
+\begin{table}
+  \centering
+   \begin{tabular}{|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2cm}|>{\centering\arraybackslash}m{2.5cm}|}
+   \hline
+   \textbf{No. clients} & \textbf{Assignments}& \textbf{Time (seconds)}\\
+     \hline
+    25 & 3040 & 5.339950 \\
+\hline
+    50 & 4301 & 7.891000 \\
+\hline
+    100 & 5630 & 11.671210 \\
+\hline
+\end{tabular}
+  \caption{Experiments results.}\label{resultsTable}
+\end{table}
+
+%50 clients were used and they worked with 20 individuals
+%each time a pool assigned a generation to them. The solution, an
+%optimum, was reached after 3159 assignments in 3.144590 seconds. For
+%100 clients the solution was reached in 6.121570 seconds and 6446
+%assignments; and for 25 clients it was 1835 assignments in 1.687000
+%seconds.
+
+
+This results shows that in this case there it is not
 convenient to use many clients in order to obtain the solution, when
-the number of clients increase there is a lot of bad solutions evaluated. 
+the number of clients increase there is a lot of bad solutions evaluated.
 % Esto deberías haberlo puesto en una tabla. Pero el problema
 % principal es que la solución es bastante mala. ¿Seguro que el
 % algoritmo genético va bien? ¿Seguro que los actores funcionan de
 % forma concurrente o ocupan todos el mismo proceso y se ejecutan de
 % forma secuencial? - JJ
+% JA: Si, ellos trabajan concurrente, el problema a de estar en otra parte del algoritmo... creo que ahora es muy tarde para encontrarlo.
 
 With this concept test we are showing how simple is to structure a parallel GA, now we could proceed with more complex GA models, experiments and problems in order to explore the potential of the technology.
 
